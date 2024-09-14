@@ -8,6 +8,10 @@ pub struct Users {
 }
 
 #[derive(Deserialize)]
-pub struct NewMessage {
-    pub message: String,
+pub struct Cars {
+    pub car_id: i32,
+    pub user_id: i32,
+    pub make: String,
+    pub model: String,
+    pub year: i32,
 }
