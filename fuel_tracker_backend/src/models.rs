@@ -1,6 +1,5 @@
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use chrono::NaiveDate;
-
 
 #[derive(Serialize, Deserialize)]
 pub struct Users {
