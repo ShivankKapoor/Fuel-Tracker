@@ -50,7 +50,7 @@ async fn main() {
         .with_state(pool);
 
     axum::Server
-        ::bind(&"127.0.0.1:8080".parse().unwrap())
+        ::bind(&"0.0.0.0:8081".parse().unwrap())
         .serve(app.into_make_service()).await
         .unwrap();
 }
