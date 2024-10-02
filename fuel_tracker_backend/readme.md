@@ -17,7 +17,7 @@ This command builds a Docker image named `fuel_tracker_backend` based on the Doc
 To run the container, use the following command:
 
 ```bash
-sudo podman run -p 127.0.0.1:8081:8081 -e DATABASE_URL="postgres://postgres:<PASSWORD>@<DB_HOST>/<DB_NAME>" fuel_tracker_backend
+sudo podman run -p 127.0.0.1:8080:8080 -e DATABASE_URL="postgres://postgres:<PASSWORD>@<DB_HOST>/<DB_NAME>" fuel_tracker_backend
 ```
 
 Replace the following placeholders with your actual information:
@@ -28,7 +28,7 @@ Replace the following placeholders with your actual information:
 
 This command does the following:
 
-- Maps port `8081` on the container to port `8081` on the host machine
+- Maps port `8080` on the container to port `8080` on the host machine
 - Sets the `DATABASE_URL` environment variable for the container
 - Runs the `fuel_tracker_backend` image
 

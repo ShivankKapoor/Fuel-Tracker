@@ -14,7 +14,7 @@ COPY src src
 RUN cargo build --release
 
 # Expose the port your application will listen on
-EXPOSE 8081
+EXPOSE 8080
 
 # Specify the command to run when the container starts
 CMD ["cargo", "run", "--release"]
