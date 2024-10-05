@@ -1,5 +1,5 @@
 use sqlx::{ PgPool, Row };
-use crate::models::{ User, NewUser };
+use crate::models::{ NewCar, NewUser, User };
 use sqlx::Result;
 
 pub async fn is_up(pool: &PgPool) -> Result<String> {
@@ -31,6 +31,18 @@ pub async fn add_user(pool: &PgPool, new_user: &NewUser) -> Result<()> {
         ::query(r#"INSERT INTO users (username, password_hash) VALUES ($1, $2)"#)
         .bind(&new_user.username)
         .bind(&new_user.password_hash)
+        .execute(pool).await?;
+
+    Ok(())
+}
+
+pub async fn add_car(pool: &PgPool, new_car: &NewCar) -> Result<()> {
+    sqlx
+        ::query(r#"INSERT INTO cars (user_id, make, model, year) VALUES ($1, $2, $3, $4)"#)
+        .bind(&new_car.user_id)
+        .bind(&new_car.make)
+        .bind(&new_car.model)
+        .bind(&new_car.year)
         .execute(pool).await?;
 
     Ok(())

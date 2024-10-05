@@ -7,8 +7,8 @@ use chrono::NaiveDate;
 mod models;
 mod db;
 
-use models::{ User, NewUser, Cars, CarCheckIns, FillUps };
-use db::{ fetch_all_users, is_up, add_user };
+use models::{ User, NewUser, Car, NewCar, CarCheckIns, FillUps };
+use db::{ add_car, add_user, fetch_all_users, is_up };
 
 pub async fn is_api_up(State(pool): State<PgPool>) -> Json<String> {
     let status = is_up(&pool).await.unwrap_or_else(|_| "Failed to retrieve status".to_string());
@@ -36,6 +36,17 @@ pub async fn create_user(
     }
 }
 
+pub async fn create_car(State(pool): State<PgPool>, Json(car): Json<NewCar>) -> impl IntoResponse {
+    match add_car(&pool, &car).await {
+        Ok(_) => (axum::http::StatusCode::CREATED, "Car created").into_response(),
+        Err(_) =>
+            (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create car",
+            ).into_response(),
+    }
+}
+
 // Main function, entry point of the application
 #[tokio::main]
 async fn main() {
@@ -46,7 +57,8 @@ async fn main() {
     let app = Router::new()
         .route("/", get(is_api_up))
         .route("/users", get(get_all_users))
-        .route("/create-user",post(create_user))
+        .route("/create-user", post(create_user))
+        .route("/create-car", post(create_car))
         .with_state(pool);
 
     axum::Server

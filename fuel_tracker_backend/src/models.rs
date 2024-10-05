@@ -14,9 +14,17 @@ pub struct NewUser {
     pub password_hash: String,
 }
 
-#[derive(Deserialize)]
-pub struct Cars {
+#[derive(Serialize, Deserialize)]
+pub struct Car {
     pub car_id: i32,
+    pub user_id: i32,
+    pub make: String,
+    pub model: String,
+    pub year: i32,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NewCar {
     pub user_id: i32,
     pub make: String,
     pub model: String,
