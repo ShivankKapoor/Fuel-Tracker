@@ -1,5 +1,5 @@
 use sqlx::{ PgPool, Row };
-use crate::models::{ NewCar, NewUser, User };
+use crate::models::{ Car, NewCar, NewUser, User };
 use sqlx::Result;
 
 pub async fn is_up(pool: &PgPool) -> Result<String> {
@@ -24,6 +24,25 @@ pub async fn fetch_all_users(pool: &PgPool) -> Result<Vec<User>> {
         .collect();
 
     Ok(users)
+}
+
+pub async fn fetch_all_cars(pool: &PgPool) -> Result<Vec<Car>> {
+    let cars = sqlx
+        ::query(r#"SELECT car_id, user_id, make,model,year FROM cars"#)
+        .fetch_all(pool).await?;
+
+    let cars = cars
+        .into_iter()
+        .map(|row| Car {
+            car_id: row.get("car_id"),
+            user_id: row.get("user_id"),
+            make: row.get("make"),
+            model: row.get("model"),
+            year: row.get("year"),
+        })
+        .collect();
+
+    Ok(cars)
 }
 
 pub async fn add_user(pool: &PgPool, new_user: &NewUser) -> Result<()> {
