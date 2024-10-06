@@ -7,8 +7,8 @@ use chrono::NaiveDate;
 mod models;
 mod db;
 
-use models::{ User, NewUser, Car, NewCar, CarCheckIns, FillUps };
-use db::{ add_car, add_user, fetch_all_cars, fetch_all_users, is_up };
+use models::{ Car, CarCheckIn, FillUp, NewCar, NewFillUp, NewUser, User };
+use db::{ add_car, add_fillup, add_user, fetch_all_cars, fetch_all_users, is_up };
 
 pub async fn is_api_up(State(pool): State<PgPool>) -> Json<String> {
     let status = is_up(&pool).await.unwrap_or_else(|_| "Failed to retrieve status".to_string());
@@ -54,6 +54,17 @@ pub async fn create_car(State(pool): State<PgPool>, Json(car): Json<NewCar>) -> 
     }
 }
 
+pub async fn create_fill_up(State(pool): State<PgPool>, Json(fill_up): Json<NewFillUp>) -> impl IntoResponse {
+    match add_fillup(&pool, &fill_up).await {
+        Ok(_) => (axum::http::StatusCode::CREATED, "Car created").into_response(),
+        Err(_) =>
+            (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create car",
+            ).into_response(),
+    }
+}
+
 // Main function, entry point of the application
 #[tokio::main]
 async fn main() {
@@ -67,6 +78,7 @@ async fn main() {
         .route("/cars",get(get_all_cars))
         .route("/create-user", post(create_user))
         .route("/create-car", post(create_car))
+        .route("/create-fillup", post(create_fill_up))
         .with_state(pool);
 
     axum::Server

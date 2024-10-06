@@ -27,7 +27,7 @@ CREATE TABLE CarCheckIns (
 CREATE TABLE FillUps (
     fillup_id SERIAL PRIMARY KEY,
     car_id INT NOT NULL REFERENCES Cars(car_id) ON DELETE CASCADE,
-    fillup_date DATE NOT NULL,
+    fillup_date VARCHAR(10) NOT NULL,
     gallons_filled DECIMAL(5,2) NOT NULL,
     price_per_gallon DECIMAL(5,2) NOT NULL,
     new_range INT NOT NULL

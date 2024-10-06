@@ -1,5 +1,5 @@
-use serde::{ Deserialize, Serialize };
 use chrono::NaiveDate;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
@@ -31,8 +31,8 @@ pub struct NewCar {
     pub year: i32,
 }
 
-#[derive(Deserialize)]
-pub struct CarCheckIns {
+#[derive(Serialize, Deserialize)]
+pub struct CarCheckIn {
     pub checkin_id: i32,
     pub car_id: i32,
     pub checkin_date: NaiveDate,
@@ -40,11 +40,28 @@ pub struct CarCheckIns {
     pub tank_left: i32,
 }
 
-#[derive(Deserialize)]
-pub struct FillUps {
+#[derive(Serialize, Deserialize)]
+pub struct NewCarCheckIn {
+    pub car_id: i32,
+    pub checkin_date: NaiveDate,
+    pub miles: i32,
+    pub tank_left: i32,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct FillUp {
     pub fillup_id: i32,
     pub car_id: i32,
-    pub fillup_date: NaiveDate,
+    pub fillup_date: String,
+    pub gallons_filled: f64,
+    pub price_per_gallon: f64,
+    pub new_range: i32,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NewFillUp {
+    pub car_id: i32,
+    pub fillup_date: String,
     pub gallons_filled: f64,
     pub price_per_gallon: f64,
     pub new_range: i32,
