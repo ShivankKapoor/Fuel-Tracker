@@ -1,6 +1,6 @@
-use sqlx::{ PgPool, Row };
-use crate::models::{ Car, NewCar, NewFillUp, NewUser, User };
+use crate::models::{Car, FillUp, NewCar, NewFillUp, NewUser, User};
 use sqlx::Result;
+use sqlx::{PgPool, Row};
 
 pub async fn is_up(pool: &PgPool) -> Result<String> {
     match sqlx::query("SELECT 1").execute(pool).await {
@@ -10,9 +10,9 @@ pub async fn is_up(pool: &PgPool) -> Result<String> {
 }
 
 pub async fn fetch_all_users(pool: &PgPool) -> Result<Vec<User>> {
-    let users = sqlx
-        ::query(r#"SELECT user_id, username, password_hash FROM users"#)
-        .fetch_all(pool).await?;
+    let users = sqlx::query(r#"SELECT user_id, username, password_hash FROM users"#)
+        .fetch_all(pool)
+        .await?;
 
     let users = users
         .into_iter()
@@ -27,9 +27,9 @@ pub async fn fetch_all_users(pool: &PgPool) -> Result<Vec<User>> {
 }
 
 pub async fn fetch_all_cars(pool: &PgPool) -> Result<Vec<Car>> {
-    let cars = sqlx
-        ::query(r#"SELECT car_id, user_id, make,model,year FROM cars"#)
-        .fetch_all(pool).await?;
+    let cars = sqlx::query(r#"SELECT car_id, user_id, make,model,year FROM cars"#)
+        .fetch_all(pool)
+        .await?;
 
     let cars = cars
         .into_iter()
@@ -45,29 +45,60 @@ pub async fn fetch_all_cars(pool: &PgPool) -> Result<Vec<Car>> {
     Ok(cars)
 }
 
+pub async fn fetch_all_fillups(pool: &PgPool) -> Result<Vec<FillUp>> {
+    let fillups = sqlx::query(
+        r#"
+        SELECT
+            fillup_id,
+            car_id,
+            fillup_date,
+            gallons_filled::FLOAT8 AS gallons_filled, 
+            price_per_gallon::FLOAT8 AS price_per_gallon,
+            new_range
+        FROM fillups
+        "#,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    let fillups = fillups
+        .into_iter()
+        .map(|row| FillUp {
+            fillup_id: row.get("fillup_id"),
+            car_id: row.get("car_id"),
+            fillup_date: row.get("fillup_date"),
+            gallons_filled: row.get("gallons_filled"),
+            price_per_gallon: row.get("price_per_gallon"),
+            new_range: row.get("new_range"),
+        })
+        .collect();
+
+    Ok(fillups)
+}
+
 pub async fn add_user(pool: &PgPool, new_user: &NewUser) -> Result<()> {
-    sqlx
-        ::query(r#"INSERT INTO users (username, password_hash) VALUES ($1, $2)"#)
+    sqlx::query(r#"INSERT INTO users (username, password_hash) VALUES ($1, $2)"#)
         .bind(&new_user.username)
         .bind(&new_user.password_hash)
-        .execute(pool).await?;
+        .execute(pool)
+        .await?;
 
     Ok(())
 }
 
 pub async fn add_car(pool: &PgPool, new_car: &NewCar) -> Result<()> {
-    sqlx
-        ::query(r#"INSERT INTO cars (user_id, make, model, year) VALUES ($1, $2, $3, $4)"#)
+    sqlx::query(r#"INSERT INTO cars (user_id, make, model, year) VALUES ($1, $2, $3, $4)"#)
         .bind(&new_car.user_id)
         .bind(&new_car.make)
         .bind(&new_car.model)
         .bind(&new_car.year)
-        .execute(pool).await?;
+        .execute(pool)
+        .await?;
 
     Ok(())
 }
 
-pub async fn add_fillup(pool: &PgPool, new_fillup: &NewFillUp) -> Result<()>{
+pub async fn add_fillup(pool: &PgPool, new_fillup: &NewFillUp) -> Result<()> {
     sqlx
         ::query(r#"INSERT INTO fillups (car_id, fillup_date, gallons_filled, price_per_gallon, new_range) VALUES ($1, $2, $3, $4, $5)"#)
         .bind(&new_fillup.car_id)

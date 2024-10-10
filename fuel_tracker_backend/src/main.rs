@@ -8,7 +8,7 @@ mod models;
 mod db;
 
 use models::{ Car, CarCheckIn, FillUp, NewCar, NewFillUp, NewUser, User };
-use db::{ add_car, add_fillup, add_user, fetch_all_cars, fetch_all_users, is_up };
+use db::{ add_car, add_fillup, add_user, fetch_all_cars, fetch_all_fillups, fetch_all_users, is_up };
 
 pub async fn is_api_up(State(pool): State<PgPool>) -> Json<String> {
     let status = is_up(&pool).await.unwrap_or_else(|_| "Failed to retrieve status".to_string());
@@ -25,6 +25,13 @@ pub async fn get_all_users(State(pool): State<PgPool>) -> Json<Vec<User>> {
 pub async fn get_all_cars(State(pool): State<PgPool>) -> Json<Vec<Car>> {
     match fetch_all_cars(&pool).await {
         Ok(cars) => Json(cars),
+        Err(_) => Json(vec![]),
+    }
+}
+
+pub async fn get_all_fillups(State(pool): State<PgPool>) -> Json<Vec<FillUp>> {
+    match fetch_all_fillups(&pool).await {
+        Ok(fillups) => Json(fillups),
         Err(_) => Json(vec![]),
     }
 }
@@ -76,6 +83,7 @@ async fn main() {
         .route("/", get(is_api_up))
         .route("/users", get(get_all_users))
         .route("/cars",get(get_all_cars))
+        .route("/fillups",get(get_all_fillups))
         .route("/create-user", post(create_user))
         .route("/create-car", post(create_car))
         .route("/create-fillup", post(create_fill_up))
